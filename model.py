@@ -6,5 +6,5 @@ class ResumeText(BaseModel):
 class ResumeAnalysis(BaseModel):
     summary: str
     skills: list[str]
-    experience: list[str]
+    experience: str
     
