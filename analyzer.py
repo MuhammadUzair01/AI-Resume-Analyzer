@@ -1,38 +1,46 @@
-import spacy                    # This library is used for natural language processing tasks.
-import re                       # This library is used for regular expressions
+import spacy                        # Natural Language Processing library
+import re                            # Regular expressions for text processing
+
+nlp = spacy.load("en_core_web_sm")                                            # Load the English NLP model
 
 
-nlp=spacy.load("en_core_web_sm")            # Load the English NLP model
-
- # List of skills to be extracted from the resume
-SKILL_SET =[                                                                   
+# Define a set of skills to look for in the resume text
+SKILL_SET = [
     "Python", "Java", "C++", "JavaScript", "SQL", "HTML", "CSS",
     "Machine Learning", "Data Analysis", "Project Management", "Communication",
     "Problem Solving", "Teamwork", "Leadership", "Agile", "Scrum", "DevOps",
     "Cloud Computing", "Cybersecurity", "Database Management", "Web Development",
     "Mobile App Development", "Software Testing", "Version Control", "API Development"
 ]
-def extract_skills(text :str) -> list:                           # Extract skills from the resume text
-    doc = nlp(text.lower())                                     # Process the text with the NLP model
-    skills_found =[]                                            # Initialize an empty list to store found skills
-    
-    for token in doc:                                           # Iterate through each token in the processed text
-        if token.text in SKILL_SET:                            # Check if the token is in the skill set
-            skills_found.append(token.text)                    # Append the skill to the list if found
-    return list(set(skills_found))                             # Return unique skills found in the resume text
 
+def extract_skills(text: str) -> list:
+    text_lower = text.lower()                            # Convert text to lowercase for case-insensitive matching
+    found_skills = []
+
+    for skill in SKILL_SET:                                  # Check each skill in the skill set
+        if skill.lower() in text_lower:                       # If the skill is found in the text
+            found_skills.append(skill)                        # Add it to the found skills list
+
+    return list(set(found_skills))                                 # Return unique skills found in the resume text
 
 def extract_experience(text: str) -> str:
-    pattern = r"(?i)(experience|work history|employment history|professional experience|career history):?\s*(.*?)(?=\n\n|\Z)"   # Regular expression to match experience sections
-    match= re.search(pattern, text.lower())  # Search for the pattern in the text
-    return match.group(0) if match else "Not matched"       # Return the matched experience section or "Not matched" if no match is found
+    experience_keywords = [                                               # Keywords to identify experience sections
+        "experience", "work history", "employment history", 
+        "professional experience", "career history", "employment"
+    ]
 
+    paragraphs = text.split("\n\n")                      # Split the text into paragraphs for better matching
+    for para in paragraphs:                                  # Check each paragraph for experience keywords
+        for keyword in experience_keywords:
+            if keyword in para.lower():
+                return para.strip()
+
+    return "Not matched"
 
 def analyze_resume(text: str) -> str:
-    doc =nlp(text)                                    # Process the resume text with the NLP model
-    sentances =list(doc.sents)                            # Split the text into sentences
-    if len(sentances)> 3:
-        return " ".join ([str(sentances[0]), str(sentances[1]), str(sentances[2])]) # Return the first three sentences as a summary
+    doc = nlp(text)                                                     # Process the text with spaCy NLP model
+    sentences = list(doc.sents)                                            # Extract sentences from the processed text
+    if len(sentences) > 3:                                                  # If there are more than 3 sentences, return the first 3
+        return " ".join([str(sentences[0]), str(sentences[1]), str(sentences[2])]) 
+    
     return text
-    
-    
