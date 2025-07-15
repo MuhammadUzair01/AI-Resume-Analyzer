@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+streamlit
+pdfplumber
+python-docx
+spacy
+pydantic
+aiofiles
